@@ -52,12 +52,14 @@ int pwm_percentage = 0;
 int16_t Vin; 
 int16_t Vout; 
 int16_t Curr;
+float dutyCycle = 0.5;    // Initial duty cycle
+float prev_power ;  // Power output of the panel
+float delta_duty = 0.01;  // Change in duty cycle for each iteration
 
 void affichage();
 
 static const u1_t PROGMEM APPEUI[8]={ 0x09, 0xF2, 0x20, 0xFF, 0xFF, 0x41, 0x40, 0xA8 };
 void os_getArtEui (u1_t* buf) { memcpy_P(buf, APPEUI, 8);}
-
 
 static const u1_t PROGMEM DEVEUI[8]={ 0x05, 0x73, 0x05, 0xD0, 0x7E, 0xD5, 0xB3, 0x70 };
 void os_getDevEui (u1_t* buf) { memcpy_P(buf, DEVEUI, 8);}
@@ -65,9 +67,7 @@ void os_getDevEui (u1_t* buf) { memcpy_P(buf, DEVEUI, 8);}
 static const u1_t PROGMEM APPKEY[16] = { 0xA3, 0x6F, 0x18, 0xCF, 0x22, 0x0C, 0xA8, 0x6B, 0x35, 0x47, 0x94, 0xEA, 0x61, 0x19, 0x61, 0x00 };
 void os_getDevKey (u1_t* buf) {  memcpy_P(buf, APPKEY, 16);}
 
-//static uint8_t mydata[] = "Hello, world!";
 static osjob_t sendjob;
-
 
 const unsigned TX_INTERVAL =  15;
 
@@ -238,13 +238,20 @@ delay(1000);
 
 void sensor_reading() 
 { 
+    while(true) {
 //  solar_voltage = get_solar_voltage(100);
 //  bat_voltage =   get_battery_voltage(100);
   solar_current = get_solar_current(100);
   solar_power = bat_voltage * solar_current; 
   pwm_percentage = map(pwm_value,0,255,0,100);
-
-  
+ if ( solar_power > prev_power) {
+    dutyCycle += delta_duty;
+  }
+    else {
+    dutyCycle -= delta_duty;
+  }
+    set_duty_cycle(dutyCycle);
+   prev_power = solar_power;
   
   
   if(bat_voltage < battery_min_voltage)
@@ -354,9 +361,12 @@ void sensor_reading()
     }// End of mode == absorption_max_current
     
   }//END of else mode == FLOAT
+         delay(100);
+}
   Vin= solar_voltage;
   Vout= bat_voltage;
   Curr= solar_current;
+        
 }
 
 
