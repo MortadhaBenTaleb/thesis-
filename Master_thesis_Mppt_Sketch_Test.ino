@@ -186,8 +186,8 @@ void setup() {
 }
 void loop() 
 {
- solar_voltage = get_solar_voltage(15);
-  bat_voltage =   get_battery_voltage(15);  
+ solar_voltage = get_solar_voltage(15); //reading the solar voltage for the fonction
+  bat_voltage =   get_battery_voltage(15);  //reading the battery voltage for the fonction
 Serial.println(bat_voltage);
 delay(1000);
  affichage();
@@ -195,18 +195,18 @@ delay(1000);
 void sensor_reading() 
 { 
     while(true) {
-  solar_current = get_solar_current(100);
+  solar_current = get_solar_current(100); //reading the solar current for the fonction
   solar_power = bat_voltage * solar_current; 
   pwm_percentage = map(pwm_value,0,255,0,100);
  if ( solar_power > prev_power) {
-    dutyCycle += delta_duty;
+    dutyCycle += delta_duty; // increment duty cycle
   }
     else {
     dutyCycle -= delta_duty;
   }
     set_duty_cycle(dutyCycle);
    prev_power = solar_power;
-  if(bat_voltage < battery_min_voltage)
+  if(bat_voltage < battery_min_voltage) //comparing the battery voltage and the minimum battery voltage
   {
     digitalWrite(load_enable,LOW);        //We DISABLE the load if battery is undervoltage
   }
@@ -324,7 +324,7 @@ float get_battery_voltage(int n_samples)
 float get_solar_current(int n_samples)
 {
   float current = 0;
-  current = ina219.getCurrent_mA();
+  current = ina219.getCurrent_mA(); //getting current from ina219
   return(current);
 }
 void affichage(){
