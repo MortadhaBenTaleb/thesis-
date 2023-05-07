@@ -4,15 +4,11 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>//LiquidCrystal_I2C lcd(0x27,20,4);  //LCD i2c adress sometimes 0x3f or 0x27
 #include <Adafruit_INA219.h>
-LiquidCrystal_I2C lcd(0x27,16,2);
-//Icons
-uint8_t Battery[8]  = {0x0E, 0x1B, 0x11, 0x11, 0x1F, 0x1F, 0x1F, 0x1F};
-uint8_t Panel[8]  = {0x1F, 0x15, 0x1F, 0x15, 0x1F, 0x15, 0x1F, 0x00};
 //Constants
-#define bulk_voltage_max 12.5
-#define bulk_voltage_min 11
-#define absorption_voltage 14.7
-#define float_voltage_max 13
+#define bulk_voltage_max 12.5 // maximum voltage in bulk stage
+#define bulk_voltage_min 11  // minimum voltage in bulk stage
+#define absorption_voltage 14.7 // voltage in absorbation stage
+#define float_voltage_max 13 
 #define battery_min_voltage 10
 #define solar_min_voltage 19
 #define charging_current 2.0
@@ -21,17 +17,21 @@ uint8_t Panel[8]  = {0x1F, 0x15, 0x1F, 0x15, 0x1F, 0x15, 0x1F, 0x00};
 #define float_voltage_min 13.2
 #define float_voltage 13.4
 #define float_max_current 0.12
-Adafruit_INA219 ina219;
-byte BULK = 0;        //Give values to each mode
-byte ABSORPTION = 1;
-byte FLOAT = 2;
-byte mode = 0;        //We start with mode 0 BULK
 //Inputs
 #define solar_voltage_in 34
 #define battery_voltage_in 39
 //Outputs
 #define PWM_out 13
 #define load_enable 17
+LiquidCrystal_I2C lcd(0x27,16,2);
+//Icons
+uint8_t Battery[8]  = {0x0E, 0x1B, 0x11, 0x11, 0x1F, 0x1F, 0x1F, 0x1F};
+uint8_t Panel[8]  = {0x1F, 0x15, 0x1F, 0x15, 0x1F, 0x15, 0x1F, 0x00};
+Adafruit_INA219 ina219;
+byte BULK = 0;        //Give values to each mode
+byte ABSORPTION = 1;
+byte FLOAT = 2;
+byte mode = 0;        //We start with mode 0 BULK
 //Variables
 float bat_voltage = 0;
 int pwm_value = 0;
