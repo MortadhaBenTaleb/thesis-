@@ -9,25 +9,25 @@
 #define bulk_voltage_min 11  // minimum voltage in bulk stage
 #define absorption_voltage 14.7 // voltage in absorbation stage
 #define float_voltage_max 13 
-#define battery_min_voltage 10
-#define solar_min_voltage 19
-#define charging_current 2.0
-#define absorption_max_current 2.0
-#define absorption_min_current 0.1
-#define float_voltage_min 13.2
-#define float_voltage 13.4
-#define float_max_current 0.12
+#define battery_min_voltage 10 // minimum voltage in the battery
+#define solar_min_voltage 19 //minimum voltage from the solar panel 
+#define charging_current 2.0 //current in charging
+#define absorption_max_current 2.0 // maximum current in absorbation stage
+#define absorption_min_current 0.1 //minimum current in absorbation stage
+#define float_voltage_min 13.2 
+#define float_voltage 13.4 
+#define float_max_current 0.12 // maximum current in float stage
 //Inputs
-#define solar_voltage_in 34
-#define battery_voltage_in 39
+#define solar_voltage_in 34 //incoming voltage from the solar panel**********
+#define battery_voltage_in 39 
 //Outputs
 #define PWM_out 13
 #define load_enable 17
-LiquidCrystal_I2C lcd(0x27,16,2);
+LiquidCrystal_I2C lcd(0x27,16,2); // declaration of lcd from library
 //Icons
 uint8_t Battery[8]  = {0x0E, 0x1B, 0x11, 0x11, 0x1F, 0x1F, 0x1F, 0x1F};
 uint8_t Panel[8]  = {0x1F, 0x15, 0x1F, 0x15, 0x1F, 0x15, 0x1F, 0x00};
-Adafruit_INA219 ina219;
+Adafruit_INA219 ina219; // declaration of ina219 from library
 byte BULK = 0;        //Give values to each mode
 byte ABSORPTION = 1;
 byte FLOAT = 2;
@@ -64,7 +64,7 @@ const lmic_pinmap lmic_pins = {
     .dio = {26, 33, 32} 
 };
 //////////////void declaration/////////////////
-void sensor_reading();
+void sensor_reading(); 
 /////////////////////////////////
 void onEvent (ev_t ev) {
     Serial.print(os_getTime());
@@ -134,6 +134,7 @@ void onEvent (ev_t ev) {
             break;
     }
 }
+//fonction to sending data (voltage and current)
 void do_send(osjob_t* j){
    sensor_reading(); 
     byte mydata[3]; 
@@ -151,18 +152,18 @@ void do_send(osjob_t* j){
     }
 }
 void setup() {
-    Serial.begin(9600);
-    Serial.println(F("Starting"));
+    Serial.begin(9600); //serial monitor initialization
+    Serial.println(F("Starting")); 
   pinMode(solar_voltage_in,INPUT);    //Set pins as inputs
   pinMode(battery_voltage_in,INPUT);
   pinMode(PWM_out,OUTPUT);            //Set pins as OUTPUTS
   digitalWrite(PWM_out,LOW);          //Set PWM to LOW so MSOFET is off
-  pinMode(load_enable,OUTPUT);
+  pinMode(load_enable,OUTPUT);       //Set pins as OUTPUTS
   digitalWrite(load_enable,LOW);      //Start with the relay turned off
   Serial.begin(9600);
-  lcd.init();                 
+  lcd.init();    // lcd initialization             
   lcd.backlight();              
-  lcd.createChar(0, Battery);
+  lcd.createChar(0, Battery); 
   lcd.createChar(1, Panel);
   if (! ina219.begin()) 
    {
@@ -186,23 +187,23 @@ void setup() {
 }
 void loop() 
 {
- solar_voltage = get_solar_voltage(15); //reading the solar voltage for the fonction
-  bat_voltage =   get_battery_voltage(15);  //reading the battery voltage for the fonction
-Serial.println(bat_voltage);
+ solar_voltage = get_solar_voltage(15); //reading the solar voltage from the fonction
+  bat_voltage =   get_battery_voltage(15);  //reading the battery voltage from the fonction
+Serial.println(bat_voltage); // prnting the battery voltage
 delay(1000);
- affichage();
+ affichage(); 
 } 
-void sensor_reading() 
+void sensor_reading()  // fonction for reading thesensor values
 { 
     while(true) {
-  solar_current = get_solar_current(100); //reading the solar current for the fonction
-  solar_power = bat_voltage * solar_current; 
+  solar_current = get_solar_current(100); //reading the solar current from the fonction
+  solar_power = bat_voltage * solar_current; // getting the solar power by multipying the battery voltage and the solar current
   pwm_percentage = map(pwm_value,0,255,0,100);
  if ( solar_power > prev_power) {
-    dutyCycle += delta_duty; // increment duty cycle
+    dutyCycle += delta_duty; // increment of duty cycle
   }
     else {
-    dutyCycle -= delta_duty;
+    dutyCycle -= delta_duty; // decrement of duty cycle
   }
     set_duty_cycle(dutyCycle);
    prev_power = solar_power;
@@ -216,23 +217,23 @@ void sensor_reading()
   ///////////////////////////FLOAT///////////////////////////
   ///////////////////////////////////////////////////////////
   if(mode == FLOAT){
-    if(bat_voltage < float_voltage_min)
+    if(bat_voltage < float_voltage_min) //comparing the battery voltage and the minimum voltage in float stage
     {
       mode = BULK;  
     }
     else{
-      if(solar_current > float_max_current)
+      if(solar_current > float_max_current) //comparing the solar current and the maximum current in float stage
       {    //If we exceed max current value, we change mode
         mode = BULK;  
       }//End if > 
       else{
-        if(bat_voltage > float_voltage)
+        if(bat_voltage > float_voltage) //comparing the battery voltage and the voltage in float stage
         {
-          pwm_value--;
+          pwm_value--; //decrement the pwm value if the condition is true
           pwm_value = constrain(pwm_value,0,254);
         }
         else {
-          pwm_value++;
+          pwm_value++; // increment the pwm if the condition is false
           pwm_value = constrain(pwm_value,0,254);
         }        
       }//End else > float_max_current
