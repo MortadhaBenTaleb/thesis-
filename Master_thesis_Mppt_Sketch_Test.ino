@@ -33,15 +33,15 @@ byte ABSORPTION = 1;
 byte FLOAT = 2;
 byte mode = 0;        //We start with mode 0 BULK
 //Variables
-float bat_voltage = 0;
-int pwm_value = 0;
-float solar_current = 0;
+float bat_voltage = 0; //initial battery voltage
+int pwm_value = 0; //initial pwm value
+float solar_current = 0; //initial solar current
 float current_factor = 0.185;       //Value defined by manufacturer ACS712 5A
-float solar_voltage = 0;
-float solar_power = 0;
-String load_status = "OFF";
-int pwm_percentage = 0;
-int16_t Vin; 
+float solar_voltage = 0; //initial solar voltage
+float solar_power = 0;  //initial solar power
+String load_status = "OFF"; 
+int pwm_percentage = 0; //initial pwm percentage
+int16_t Vin;  
 int16_t Vout; 
 int16_t Curr;
 float dutyCycle = 0.5;    // Initial duty cycle
