@@ -1,9 +1,9 @@
-#include <lmic.h>
-#include <hal/hal.h>
-#include <SPI.h>
-#include <Wire.h> 
+#include <lmic.h> // using lmic library for lorawan
+#include <hal/hal.h> //using hal library
+#include <SPI.h> //using spi library for spi protocol
+#include <Wire.h> //using wire library for i2c  protocol
 #include <LiquidCrystal_I2C.h>//LiquidCrystal_I2C lcd(0x27,20,4);  //LCD i2c adress sometimes 0x3f or 0x27
-#include <Adafruit_INA219.h>
+#include <Adafruit_INA219.h> //using adafruit library for the ina219
 //Constants
 #define bulk_voltage_max 12.5 // maximum voltage in bulk stage
 #define bulk_voltage_min 11  // minimum voltage in bulk stage
