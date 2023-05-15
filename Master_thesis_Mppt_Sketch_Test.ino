@@ -147,18 +147,18 @@ void onEvent (ev_t ev) {
 }
 //fonction to sending data (voltage and current)
 void do_send(osjob_t* j){
-   sensor_reading(); 
-    byte mydata[3]; 
-    mydata[0] = Vin ;
-    mydata[1] = Vout ; 
-    mydata[2] = Curr; 
+   sensor_reading();// Read sensor values 
+byte mydata[3]; // Array to store data
+  mydata[0] = Vin; // Store solar voltage in data array
+  mydata[1] = Vout; // Store battery voltage in data array
+  mydata[2] = Curr; // Store solar current in data array
     if (LMIC.opmode & OP_TXRXPEND)
     {
         Serial.println(F("OP_TXRXPEND, not sending"));
     }
     else 
     {
-        LMIC_setTxData2(1, mydata, sizeof(mydata)-1, 0);
+        LMIC_setTxData2(1, mydata, sizeof(mydata)-1, 0); // Send data
         Serial.println(F("Packet queued"));
     }
 }
@@ -206,6 +206,7 @@ delay(1000);
 } 
 void sensor_reading()  // fonction for reading thesensor values
 { 
+  // this part presente the relation between strategy p&o and bulk,absorption and float algorithm
     while(true) //meaning that the loop will continue to run indefinitely until the program is stopped or interrupted. {
   solar_current = get_solar_current(100); //reading the solar current from the fonction
   solar_power = bat_voltage * solar_current; // getting the solar power by multipying the battery voltage and the solar current
@@ -327,6 +328,7 @@ float get_solar_voltage(int n_samples)
   if(voltage < 0){voltage = 0;}
   return(voltage);
 }
+//The function get_battery_voltage is used to measure the battery voltage by taking multiple samples and calculating the average value. 
 float get_battery_voltage(int n_samples)
 {
   float voltage = 0;
@@ -335,10 +337,11 @@ float get_battery_voltage(int n_samples)
     voltage += analogRead(battery_voltage_in) * 0.0046003417968 ;
     delay(1);      
   }
-  voltage = voltage/n_samples-0.2;
+  voltage = voltage/n_samples-0.2;//A constant offset of -0.2 is subtracted from the average voltage value.
   if(voltage < 0){voltage = 0;}
   return(voltage);
 }
+//The get_solar_current function assumes that the INA219 sensor object (ina219) is properly initialized and connected to the solar current source. It relies on the functionality provided by the INA219 library to accurately measure the current.
 float get_solar_current(int n_samples)
 {
   float current = 0;
