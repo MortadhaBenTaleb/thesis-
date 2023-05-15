@@ -8,21 +8,21 @@
 #define bulk_voltage_max 12.5 // maximum voltage in bulk stage
 #define bulk_voltage_min 11  // minimum voltage in bulk stage
 #define absorption_voltage 14.7 // voltage in absorbation stage
-#define float_voltage_max 13 
+#define float_voltage_min 13 
 #define battery_min_voltage 10 // minimum voltage in the battery
 #define solar_min_voltage 19 //minimum voltage from the solar panel 
 #define charging_current 2.0 //current in charging
 #define absorption_max_current 2.0 // maximum current in absorbation stage
 #define absorption_min_current 0.1 //minimum current in absorbation stage
-#define float_voltage_min 13.2 
-#define float_voltage 13.4 
+#define float_voltage_max 13.4 
+#define float_voltage 13.2 
 #define float_max_current 0.12 // maximum current in float stage
 //Inputs
-#define solar_voltage_in 34 //incoming voltage from the solar panel**********
-#define battery_voltage_in 39 
+#define solar_voltage_in 34 //input of solar panel
+#define battery_voltage_in 39 //input of battery
 //Outputs
-#define PWM_out 13
-#define load_enable 17
+#define PWM_out 13 //output of pwm
+#define load_enable 17 //output of load
 LiquidCrystal_I2C lcd(0x27,16,2); // declaration of lcd from library
 //Icons
 uint8_t Battery[8]  = {0x0E, 0x1B, 0x11, 0x11, 0x1F, 0x1F, 0x1F, 0x1F};
@@ -63,9 +63,9 @@ void os_getDevEui (u1_t* buf) { memcpy_P(buf, DEVEUI, 8);}
 static const u1_t PROGMEM APPKEY[16] = { 0xA3, 0x6F, 0x18, 0xCF, 0x22, 0x0C, 0xA8, 0x6B, 0x35, 0x47, 0x94, 0xEA, 0x61, 0x19, 0x61, 0x00 };
 void os_getDevKey (u1_t* buf) {  memcpy_P(buf, APPKEY, 16);}
 static osjob_t sendjob;
-// Schedule TX every this many seconds (might become longer due to duty
-// cycle limitations).
+// Schedule TX every this many seconds (might become longer due to duty cycle limitations).
 const unsigned TX_INTERVAL =  15;
+
 // Pin mapping
 const lmic_pinmap lmic_pins = {
     .nss = 18, 
@@ -170,7 +170,6 @@ void setup() {
   digitalWrite(PWM_out,LOW);          //Set PWM to LOW so MSOFET is off
   pinMode(load_enable,OUTPUT);       //Set pins as OUTPUTS
   digitalWrite(load_enable,LOW);      //Start with the relay turned off
-  Serial.begin(9600);
   lcd.init();    // lcd initialization             
   lcd.backlight();              
   lcd.createChar(0, Battery); 
@@ -183,8 +182,8 @@ void setup() {
       delay(10);
     }
    }
-    #ifdef VCC_ENABLE
     // For Pinoccio Scout boards
+    #ifdef VCC_ENABLE
     pinMode(VCC_ENABLE, OUTPUT);
     digitalWrite(VCC_ENABLE, HIGH);
     delay(1000);
@@ -206,18 +205,21 @@ delay(1000);
 } 
 void sensor_reading()  // fonction for reading thesensor values
 { 
-    while(true) {
+    while(true) //meaning that the loop will continue to run indefinitely until the program is stopped or interrupted. {
   solar_current = get_solar_current(100); //reading the solar current from the fonction
   solar_power = bat_voltage * solar_current; // getting the solar power by multipying the battery voltage and the solar current
   pwm_percentage = map(pwm_value,0,255,0,100);
- if ( solar_power > prev_power) {
-    dutyCycle += delta_duty; // increment of duty cycle
+ // If power has increased, increase duty cycle
+        if ( solar_power > prev_power) {
+    dutyCycle += delta_duty; 
   }
-    else {
-    dutyCycle -= delta_duty; // decrement of duty cycle
+   // If power has decreased, decrease duty cycle
+        else {
+    dutyCycle -= delta_duty; 
   }
+     // Update duty cycle of DC-DC converter
     set_duty_cycle(dutyCycle);
-   prev_power = solar_power;
+   prev_power = solar_power; // Save previous power value
   if(bat_voltage < battery_min_voltage) //comparing the battery voltage and the minimum battery voltage
   {
     digitalWrite(load_enable,LOW);        //We DISABLE the load if battery is undervoltage
@@ -227,7 +229,8 @@ void sensor_reading()  // fonction for reading thesensor values
   }
   ///////////////////////////FLOAT///////////////////////////
   ///////////////////////////////////////////////////////////
-  if(mode == FLOAT){
+ // this part snippet checks if the battery is in FLOAT mode and switches to BULK mode if either the battery voltage is below the minimum voltage threshold or the solar current exceeds the maximum current limit allowed in the FLOAT mode.
+    if(mode == FLOAT){
     if(bat_voltage < float_voltage_min) //comparing the battery voltage and the minimum voltage in float stage
     {
       mode = BULK;  
@@ -264,7 +267,8 @@ void sensor_reading()  // fonction for reading thesensor values
     }
     ////////////////////////////BULK///////////////////////////
     ///////////////////////////////////////////////////////////
-    if(mode == BULK){
+    // the charging mode is set to "BULK", the program adjusts the PWM duty cycle based on the difference between the solar current and the charging current.By adjusting the PWM duty cycle in this way, the program can regulate the charging current to the battery and prevent overcharging or undercharging.  
+      if(mode == BULK){
       if(solar_current > charging_current)
       {
         pwm_value--;
@@ -303,12 +307,13 @@ void sensor_reading()  // fonction for reading thesensor values
     }// End of mode == absorption_max_current
     
   }//END of else mode == FLOAT
-         delay(100);
+         delay(100);// Wait for some time before next iteration
 }
   Vin= solar_voltage;
   Vout= bat_voltage;
   Curr= solar_current;        
 }
+//the function returns the average voltage value as a floating-point value. The unit of the voltage value returned depends on the voltage reference used by the ADC and the calibration factor applied.
 float get_solar_voltage(int n_samples)
 { 
    float voltage = 0;
