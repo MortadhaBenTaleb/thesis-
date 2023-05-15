@@ -8,13 +8,13 @@
 #define bulk_voltage_max 12.5 // maximum voltage in bulk stage
 #define bulk_voltage_min 11  // minimum voltage in bulk stage
 #define absorption_voltage 14.7 // voltage in absorbation stage
-#define float_voltage_min 13 
+#define float_voltage_min 13 //minimum current in float stage
 #define battery_min_voltage 10 // minimum voltage in the battery
 #define solar_min_voltage 19 //minimum voltage from the solar panel 
 #define charging_current 2.0 //current in charging
 #define absorption_max_current 2.0 // maximum current in absorbation stage
 #define absorption_min_current 0.1 //minimum current in absorbation stage
-#define float_voltage_max 13.4 
+#define float_voltage_max 13.4 // maximum voltage in float stage
 #define float_voltage 13.2 
 #define float_max_current 0.12 // maximum current in float stage
 //Inputs
