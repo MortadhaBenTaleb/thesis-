@@ -47,6 +47,7 @@ int16_t Curr;
 float dutyCycle = 0.5;    // Initial duty cycle
 float prev_power ;  // Power output of the panel
 float delta_duty = 0.01;  // Change in duty cycle for each iteration
+// Declare a function for displaying values on the LCD
 void affichage();
 // This EUI must be in little-endian format, so least-significant-byte
 // first. When copying an EUI from ttnctl output, this means to reverse
