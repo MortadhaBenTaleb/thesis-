@@ -48,14 +48,23 @@ float dutyCycle = 0.5;    // Initial duty cycle
 float prev_power ;  // Power output of the panel
 float delta_duty = 0.01;  // Change in duty cycle for each iteration
 void affichage();
-
+// This EUI must be in little-endian format, so least-significant-byte
+// first. When copying an EUI from ttnctl output, this means to reverse
+// the bytes. For TTN issued EUIs the last bytes should be 0xD5, 0xB3,
+// 0x70.
 static const u1_t PROGMEM APPEUI[8]={ 0x09, 0xF2, 0x20, 0xFF, 0xFF, 0x41, 0x40, 0xA8 };
 void os_getArtEui (u1_t* buf) { memcpy_P(buf, APPEUI, 8);}
+// This should also be in little endian format, see above.
 static const u1_t PROGMEM DEVEUI[8]={ 0x05, 0x73, 0x05, 0xD0, 0x7E, 0xD5, 0xB3, 0x70 };
 void os_getDevEui (u1_t* buf) { memcpy_P(buf, DEVEUI, 8);}
+// This key should be in big endian format (or, since it is not really a
+// number but a block of memory, endianness does not really apply). In
+// practice, a key taken from ttnctl can be copied as-is.
 static const u1_t PROGMEM APPKEY[16] = { 0xA3, 0x6F, 0x18, 0xCF, 0x22, 0x0C, 0xA8, 0x6B, 0x35, 0x47, 0x94, 0xEA, 0x61, 0x19, 0x61, 0x00 };
 void os_getDevKey (u1_t* buf) {  memcpy_P(buf, APPKEY, 16);}
 static osjob_t sendjob;
+// Schedule TX every this many seconds (might become longer due to duty
+// cycle limitations).
 const unsigned TX_INTERVAL =  15;
 // Pin mapping
 const lmic_pinmap lmic_pins = {
@@ -175,6 +184,7 @@ void setup() {
     }
    }
     #ifdef VCC_ENABLE
+    // For Pinoccio Scout boards
     pinMode(VCC_ENABLE, OUTPUT);
     digitalWrite(VCC_ENABLE, HIGH);
     delay(1000);
