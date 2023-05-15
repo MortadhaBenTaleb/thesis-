@@ -48,6 +48,7 @@ float dutyCycle = 0.5;    // Initial duty cycle
 float prev_power ;  // Power output of the panel
 float delta_duty = 0.01;  // Change in duty cycle for each iteration
 void affichage();
+
 static const u1_t PROGMEM APPEUI[8]={ 0x09, 0xF2, 0x20, 0xFF, 0xFF, 0x41, 0x40, 0xA8 };
 void os_getArtEui (u1_t* buf) { memcpy_P(buf, APPEUI, 8);}
 static const u1_t PROGMEM DEVEUI[8]={ 0x05, 0x73, 0x05, 0xD0, 0x7E, 0xD5, 0xB3, 0x70 };
